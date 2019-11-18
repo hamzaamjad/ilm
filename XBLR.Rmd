@@ -1,0 +1,144 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+packages <- c('tidyverse', 'jsonlite', 'rvest', 'xml2', 'lubridate', 'tsibble')
+installed <- packages %in% rownames(installed.packages())
+packages_install <- packages[!installed]
+packages_load <- packages[installed]
+
+invisible(lapply(packages_install, install.packages))
+invisible(lapply(c(packages_load, packages_install), library, character.only = T))
+```
+
+```{r}
+cik_tickers <- read_tsv('https://www.sec.gov/include/ticker.txt', col_names = c('ticker', 'cik_str'))
+
+cik_tickers_company <- fromJSON('https://www.sec.gov/files/company_tickers.json') %>%
+  lapply(function(x) {
+    x[sapply(x, is.null)] <- NA
+    unlist(x)
+  }) %>%
+  do.call('rbind', .) %>%
+  as_tibble() %>%
+  {.[!duplicated(.), ]}
+
+cik_master <- read_delim('https://www.sec.gov/Archives/edgar/cik-lookup-data.txt', ':', col_names = c('title', 'cik_str', 'x')) %>%
+  {.[,c(1:2)]}
+```
+```{r}
+tickers <- c('WFC', 'JPM')
+
+get_cik <- function(tickers) {
+  df <- cik_tickers_company %>%
+    filter(ticker %in% tickers)
+  return(df)
+}
+
+get_filing_list <- function(cik, type, dateb = '', count = '') {
+  url_base <- 'https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany'
+  url <- paste0(url_base, '&CIK=', cik, '&type=', type, '&dateb=', dateb, 'count=', count, '&owner=exclude&output=atom')
+  
+  response <- read_xml(url)
+  ns <- xml_ns(response)
+  
+  entries <- xml_find_all(response, '//d1:entry', ns)
+  
+  content <- xml_find_all(entries, xpath = '//d1:content', ns)
+  
+  content <- construct_frame(content) %>%
+        mutate(`filing-date` = as.Date(`filing-date`, '%Y-%m-%d')) %>%
+        as_tsibble(index = `filing-date`) %>%
+        index_by(year = year(`filing-date`)) %>%
+        group_by(year)
+  
+  return(content)
+}
+
+construct_frame <- function(content) {
+    frame <- list()
+    for (row in content) {
+      x <- list()
+      children <- xml_children(row)
+      
+      for (i in 1:length(children)) {
+        name <- xml_name(children[i])
+        val <- xml_text(children[i])
+        if (name %in% names(x)){
+          names(val) <- paste0(name,sum(grepl(name, names(x))))
+        } else {
+        names(val) <- name
+        }
+        x <- append(x, c(val))
+      }
+      
+      frame <- append(frame, list(x))
+      
+      }
+    
+      foo <- function (...) {
+        dargs <- list(...)
+        all.names <- unique(names(unlist(dargs)))
+        out <- do.call(rbind, lapply(dargs, `[`, all.names))
+        colnames(out) <- all.names
+        as.data.frame(out, stringsAsFactors = FALSE)
+      }
+      
+      unlister <- function(a) {
+        a[sapply(a, is.null)] <- NA
+        unlist(a)
+      }
+      
+      frame <- do.call(foo, frame) 
+      frame <- frame %>%
+        as_tibble() %>%
+        mutate_all(unlister) 
+    return(frame)
+  }
+
+tickers <- get_cik(tickers)
+```
+```{r}
+get_annuals <- function(filing_list, filter_year = numeric(), filter_range = numeric()) {
+  filing_list <- filing_list %>%
+    filter(year >= (filter_year - filter_range) & year <= filter_year & !(is.na(xbrl_href))) %>%
+    mutate(yeartype = paste0(year, `filing-type`))
+  
+  filing_types <- filing_list %>%
+    summarize(type = paste(sort(unique(`filing-type`)),collapse=", "))
+  
+  filing_types$type <- unlist(lapply(filing_types$type, function(x){
+    if (!grepl('10-K/A', x)){
+      return(x)
+    } else {
+      return(trimws(gsub('10-K/A', '', x)))
+    }
+  }))
+  
+  filing_types <- filing_types %>%
+    mutate(yeartype = paste0(year, type))
+  
+  filing_list <- filing_list %>% filter(yeartype %in% filing_types$yeartype)
+  report_urls <- filing_list$`filing-href`
+  
+  report_urls <- lapply(report_urls, read_html)
+  report_urls <- lapply(report_urls, xml_find_all, '//table')
+  report_urls <- lapply(report_urls, function(x){html_table(x[2])})
+  names(report_urls) <- paste0(dirname(filing_list$`filing-href`),'/')
+  
+  report_urls <- lapply(names(report_urls), function(x){do.call('paste0',list(x,report_urls[[x]][[1]][[3]]))})
+  names(report_urls) <- filing_list$`year`
+  
+  return(report_urls)
+}
+
+universe_fins <- lapply(tickers$cik_str, get_filing_list, type = '10-K')
+universe_fins <- lapply(universe_fins, get_annuals, filter_year = 2019, filter_range = 30)
+names(universe_fins) <- tickers$ticker
+lapply(universe_fins, FromListSimple)
+```
+
+
+
