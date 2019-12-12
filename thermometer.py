@@ -24,19 +24,14 @@ def read_temp():
         temp_f = temp_c * 9.0 / 5.0 + 32.0
         return {'date' : datetime.datetime.utcnow(), 'temp_cel' : temp_c, 'temp_far' : temp_f}
 
+# Requires dnspython
 import pymongo
 
-client = pymongo.MongoClient("")
-db = client['test']
-col = db['measure']
+client = pymongo.MongoClient("mongodb+srv://hamjad:%40Monsterhunter7@ilm-jxzmo.mongodb.net/test?retryWrites=true&w=majority")
+db = client['measures']
+col = db['temp-pi']
 
 while True:
     temp = read_temp()
-    print(temp)
-    
+    col.insert_one(temp)
     time.sleep(60)
-#table = """
-#CREATE TABLE temperature (
- #   tempID SERIAL,
-  #  tempDate TIMESTAMP NOT NULL,
-   # tempC NUMERIC NOT NULL,
