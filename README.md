@@ -1,1 +1,2 @@
-# Test
+# What is Ilm?
+Ilm (علم) is the Arabic word for **knowledge**. In the context of this directory, it is a collection of Python packages designed to assist with the aggregation or generation of **data**, which can be transformed into **information** -- data with context. Users can process information as they please in the pursuit of **knowledge** -- understanding, experience and accumulated learning.
