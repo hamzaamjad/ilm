@@ -6,8 +6,8 @@ Ilm (علم) is the Arabic word for **knowledge**. In the context of this direct
   1. The retreival & storage of XBRL files
   2. Parsing & light-weight analysis of XBRL files, whether locally stored or retreived on an ad-hoc basis.
 
-## Ilm - Loan (IN DEVELOPMENT)
-`ilm-loan` is a generator -- it randomly generates loan terms and calculates associated cash flows (assuming the loan performs). Loans can be amoritizing or non-amoritizing. A loan object consists of:
+## Ilm - Loan Modeler(IN DEVELOPMENT)
+`ilm-loanmodeler` is a generator -- it randomly generates loan terms and calculates associated cash flows (assuming the loan performs). Loans can be amoritizing or non-amoritizing. A loan object consists of:
   1. Loan Terms
   2. Loan Schedule
   3. Lender Cash Flows
