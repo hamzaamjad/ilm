@@ -15,25 +15,11 @@ Ilm (علم) is the Arabic word for **knowledge**. In the context of this direct
   
   Generating loans is simple:
   ```python
-  from ilm-loanmodeler import generate_loan_terms, generate_loan
+  import ilm-loanmodeler
   
-  terms = generate_loan_terms()
-  print(terms)
-  ```
-  ```python
-  {'principal':10000000,
- 'cash_rate':0.1,
- 'interest_reserve_rate':0.0,
- 'interest_reserve_term':1,
- 'origination_points':0.0,
- 'origination_points_deferred':0.0,
- 'date_originated':datetime.strptime('2020-01-01', '%Y-%m-%d'),
- 'date_payoff':datetime.strptime('2021-01-01', '%Y-%m-%d'),
- 'amortization_term':0
-}
-  ```
-  ```python
-  generate_loan(terms)
+  terms = generate_terms() # Generate random loan terms
+  loan = generate_loan(terms) # Create loan object
+  metrics = calculate_metrics(loan) # Calculate investor metrics for individual loan
   ```
 
 ## Ilm - Fund (NOT STARTED)
