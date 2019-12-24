@@ -6,7 +6,7 @@ Ilm (علم) is the Arabic word for **knowledge**. In the context of this direct
   1. The retreival & storage of XBRL files
   2. Parsing & light-weight analysis of XBRL files, whether locally stored or retreived on an ad-hoc basis.
 
-## Ilm - Loan Modeler(IN DEVELOPMENT)
+## Ilm - Loan Modeler (IN DEVELOPMENT)
 `ilm-loanmodeler` is a generator -- it randomly generates loan terms and calculates associated cash flows (assuming the loan performs). Loans can be amoritizing or non-amoritizing. A loan object consists of:
   1. Loan Terms
   2. Loan Schedule
@@ -17,9 +17,9 @@ Ilm (علم) is the Arabic word for **knowledge**. In the context of this direct
   ```python
   import ilm-loanmodeler
   
-  terms = generate_terms() # Generate random loan terms
-  loan = generate_loan(terms) # Create loan object
-  metrics = calculate_metrics(loan) # Calculate investor metrics for individual loan
+  terms = generate_terms() # Generate terms
+  loan = generate_loan(terms) # Create loan
+  metrics = calculate_metrics(loan) # Calculate metrics
   ```
 
 ## Ilm - Fund (NOT STARTED)
