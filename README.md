@@ -12,6 +12,29 @@ Ilm (علم) is the Arabic word for **knowledge**. In the context of this direct
   2. Loan Schedule
   3. Lender Cash Flows
   4. Metadata for use in other analysis packages
+  
+  Generating loans is simple:
+  ```python
+  from ilm-loanmodeler import generate_loan_terms, generate_loan
+  
+  terms = generate_loan_terms()
+  print(terms)
+  ```
+  ```python
+  {'principal':10000000,
+ 'cash_rate':0.1,
+ 'interest_reserve_rate':0.0,
+ 'interest_reserve_term':1,
+ 'origination_points':0.0,
+ 'origination_points_deferred':0.0,
+ 'date_originated':datetime.strptime('2020-01-01', '%Y-%m-%d'),
+ 'date_payoff':datetime.strptime('2021-01-01', '%Y-%m-%d'),
+ 'amortization_term':0
+}
+  ```
+  ```python
+  generate_loan(terms)
+  ```
 
 ## Ilm - Fund (NOT STARTED)
 `ilm-fund` is an aggregator -- it combines cash flows from a provided asset-universe into a blended fund model, netting out simulated management fees and fund expenses. It is intended to be used with `ilm-loanmodeler` to generate simulated fund models for private debt funds.
