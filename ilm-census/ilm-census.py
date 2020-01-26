@@ -2,6 +2,42 @@ import requests
 import pandas as pd
 import numpy as np
 
+# Global Inputs
+google_api_key = r'INSERT_YOUR_KEY_HERE'
+
+# References Google's Geocoding API
+# https://developers.google.com/maps/documentation/geocoding/start
+# Uses f-strings, Python 3.6+
+def geocode_address(address):
+    address = [x.replace(" ", "+") for x in address.split(",")]
+    url = f'https://maps.googleapis.com/maps/api/geocode/json?address={address[0]},{address[1]},{address[2]}&key={google_api_key}'
+
+    try:
+        response = requests.get(url)
+        result = response.json()['results'][0]
+        output = {'address' : result['formatted_address'], 'location' : result['geometry']['location']}
+    except:
+        print("Error in geocoding. URL attempted: ", url)
+    return(output)
+
+# Expects an 'address' dictionary output by geocode_address
+def address_parts(address, location):
+    address_parts = [x.strip() for x in address.split(",")]
+    output = {'address' : address, 'location' : location, 'address_parts' : {'street' : address_parts[0], 'city' : address_parts[1], 'state' : address_parts[2][:2], 'zip_code' : address_parts[2][-5:], 'country' : address_parts[3]}}
+    return(output)
+
+# Expects an 'address' dictionary output by geocode_address, with further modification by address_parts
+def address_census_keys(address, location, address_parts, benchmark = 'Public_AR_Current', vintage = 'ACS2019_Current'):
+    url = 'https://geocoding.geo.census.gov/geocoder/geographies/coordinates'
+    layers = ['2010 Census Blocks', 'Secondary School Districts', '2019 State Legislative Districts - Upper', 'County Subdivisions', 'Elementary School Districts', 'Metropolitan Statistical Areas', 'Counties', '2019 State Legislative Districts - Lower', 'Census Block Groups', 'Combined Statistical Areas', '2010 Census ZIP Code Tabulation Areas', 'Census Tracts']
+    url_params = {'x' : location['lng'], 'y' : location['lat'], 'benchmark' : benchmark, 'vintage' : vintage, 'layers' : layers, 'format' : 'json'}
+    response = requests.get(url, params = url_params)
+    result = response.json()['result']
+    geographies = {k1: {k2: v2 for k2, v2 in next(iter(v1 or []), dict()).items() if (k2 in ['GEOID', 'CENTLAT', 'BASENAME', 'NAME', 'CENTLON'])} for k1, v1 in result['geographies'].items()}
+    output = {'address' : address, 'location' : location, 'address_parts' : address_parts, 'geographies' : geographies}
+    return(output)
+
+# Sample call - datasets_census(vintage = 2017)
 def datasets_census(dataset = False, vintage = False):
     urls = ['https://api.census.gov/data/2010.json','https://api.census.gov/data.json']
     datasets = pd.DataFrame()
@@ -24,9 +60,5 @@ def datasets_census(dataset = False, vintage = False):
         if not vintage:
             continue
         else:
-            datasets = datasets[datasets['c_vintage'] == vintage]
-            
+            datasets = datasets[datasets['c_vintage'] == vintage]     
     return(datasets)
-
-datasets = datasets_census(vintage = 2017)
-datasets
