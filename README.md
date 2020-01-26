@@ -4,7 +4,7 @@ Ilm (علم) is the Arabic word for **knowledge**. In the context of this direct
 ## Ilm - Census (IN DEVELOPMENT - ACTIVE)
 `ilm-census` provides helper functions to understand and extract Demographic data produced by the U.S. Census Bureau. Users can:
   1. Geocode an address and retreive its associated geographic identifiers
-  2. View datasets and their associated data made available by the U.S. Census Bureau
+  2. View Census datasets and their associated metadata
   3. Extract and load data from various Census datasets into flat files
 
 ## Ilm - XBRL (IN DEVELOPMENT - PAUSED)
