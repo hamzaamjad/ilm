@@ -1,23 +1,64 @@
 import requests
 import pandas as pd
 import numpy as np
+import configparser
+import os
 
-# Global Inputs
-google_api_key = r'INSERT_YOUR_KEY_HERE'
+# Create INI file to store various API credentials
+def generate_ini():
+    config = configparser.ConfigParser()
+    config['Census API'] = {}
+    config['Google APIs'] = {}
+    with open('ilm.ini', 'w') as configfile:
+        config.write(configfile)
+    print("ilm.ini created. Saved in", os.getcwd())
+
+# Insert Google API keys into INI file
+# ini_google({'geocoding' : 'api_key_here'})
+def ini_google(api_keys = {}):
+    config = configparser.ConfigParser()
+    config.read('ilm.ini')
+    google = config['Google APIs']
+    try:
+        for k, v in api_keys.items():
+            google[k] = v
+    except:
+        print("Error")
+    
+    with open('ilm.ini', 'w') as configfile:
+        config.write(configfile)
+    print("Keys successfuly inserted:")
+    print("-------------------------------")
+    for k, v in api_keys.items():
+        print(k,"|",google[k])
+
+# Read a specific variable from INI file
+# Typically used in other functions to pass API keys & passwords at runtime
+def read_ini(header, variable):
+    config = configparser.ConfigParser()
+    config.read('ilm.ini')
+    header_variable = config[header][variable]
+    return(header_variable)
 
 # References Google's Geocoding API
 # https://developers.google.com/maps/documentation/geocoding/start
 # Uses f-strings, Python 3.6+
 def geocode_address(address):
+    api_key = read_ini('Google APIs','geocoding')
     address = [x.replace(" ", "+") for x in address.split(",")]
-    url = f'https://maps.googleapis.com/maps/api/geocode/json?address={address[0]},{address[1]},{address[2]}&key={google_api_key}'
-
+    url = f'https://maps.googleapis.com/maps/api/geocode/json?address={address[0]},{address[1]},{address[2]}&key={api_key}'
+    response = requests.get(url)
+    response = response.json()
     try:
-        response = requests.get(url)
-        result = response.json()['results'][0]
-        output = {'address' : result['formatted_address'], 'location' : result['geometry']['location']}
+        if response['status'] == 'REQUEST_DENIED':
+            print(response['status'])
+            return(response['error_message'])
+        elif response['status'] == 'OK':
+            result = response['results'][0]
+            output = {'address' : result['formatted_address'], 'location' : result['geometry']['location']}
     except:
         print("Error in geocoding. URL attempted: ", url)
+        return(url)
     return(output)
 
 # Expects an 'address' dictionary output by geocode_address
@@ -45,7 +86,7 @@ def datasets_census(dataset = False, vintage = False):
         response = requests.get(url)
         response = response.json()
         df = pd.DataFrame(response['dataset'])
-        if 'c_isTimeseries' not in df.columns:
+        if 'c_isTimeseries' not in list(df):
             df.insert(loc = len(df.columns), column = 'c_isTimeseries', value = np.nan)
             datasets = pd.concat([datasets, df], sort = False, ignore_index = True)
         else:
