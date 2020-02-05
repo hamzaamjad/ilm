@@ -31,28 +31,35 @@ Below is a list of functions to add credentials to `ilm.ini`:
 
 ## Ilm - Census (IN DEVELOPMENT - ACTIVE)
 `ilm-census` provides helper functions to understand and extract Demographic data produced by the U.S. Census Bureau. Users can:
-  1. Geocode an address and retreive its associated geographic identifiers
-  ```python
-  >>> geocode_address("1600 Pennsylvania Ave NW, Washington, DC 20500") # Google Geocoding API
 
-# Dictionary formatted for display
+  1. Geocode an address and retreive its associated geographic identifiers
+
+  ```python
+  # Leverages Google Geocoding API
+  >>> geocode_address("1600 Pennsylvania Ave NW, Washington, DC 20500")
+
+  # Dictionary formatted for display
   {
     'address': '1600 Pennsylvania Ave NW, Washington, DC 20500, USA',
     'location': {'lat': 38.8976633, 'lng': -77.0365739}
   }
   ```
+  
   2. View Census datasets and their associated metadata
+
   3. Extract and load data from various Census datasets into flat files
 
   For Google Geocoding API Key, please visit the following: [Geocoding API - Get an API Key](https://developers.google.com/maps/documentation/geocoding/get-api-key)
 
 ## Ilm - XBRL (IN DEVELOPMENT - PAUSED)
 `ilm-xbrl` is an lxml-based XBRL parser for U.S. Public Company Filings. It facilitates, at scale:
+
   1. The retrieval & storage of XBRL files
   2. Parsing & light-weight analysis of XBRL files, whether locally stored or retrieved on an ad-hoc basis
 
 ## Ilm - Loan (IN DEVELOPMENT - PAUSED)
 `ilm-loan` is a generator -- it randomly generates loan terms and calculates associated cash flows (assuming the loan performs). Loans can be amoritizing or non-amoritizing. A loan object consists of:
+
   1. Loan Terms
   2. Loan Schedule
   3. Lender Cash Flows
