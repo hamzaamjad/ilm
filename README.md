@@ -8,14 +8,14 @@ Some of the libraries below require credentials -- Credentials are stored in _il
 # Create blank ilm.ini file in working directory
 >>> generate_ini()
 
-ilm.ini created. Saved in /Users/hamzaamjad/OneDrive/Code/ilm/ilm-census
+'ilm.ini created. Saved in /Users/hamzaamjad/OneDrive/Code/ilm/ilm-census'
 
 # Can add multiple values. The following are supported: geocoding (Google Maps Geocoding API)
 >>> ini_google({'geocoding' : 'your_key_here'})
 
-Keys successfuly inserted:
--------------------------------
-geocoding | your_key_here
+'Keys successfuly inserted:'
+'----------------------------'
+'geocoding | your_key_here'
 
 # Test .ini file to see if key was stored
 >>> read_ini('Google APIs','geocoding')
@@ -24,6 +24,7 @@ geocoding | your_key_here
 ```
 
 Below is a list of functions to add credentials to `ilm.ini`:
+
 |Function|Parameters|Example|
 |---|---|---|
 |ini_google|{'api' : 'api_key'}|`ini_google({'geocoding' : 'your_key'})`|
