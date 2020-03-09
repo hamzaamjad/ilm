@@ -1,2 +1,6 @@
 ilm.ini
 ilm-census/ilm.ini
+
+__pycache__
+.vscode
+.vscode/settings.json
