@@ -67,3 +67,7 @@ Below is a list of functions to add credentials to `ilm.ini`:
 
 ## Ilm - Fund (NOT STARTED)
 `ilm-fund` is an aggregator -- it combines cash flows from a provided asset-universe into a blended fund model, netting out simulated management fees and fund expenses. It is intended to be used with `ilm-loanmodeler` to generate simulated fund models for private debt funds.
+
+## Contributors
+#### Active Developers
+Hamza Amjad
